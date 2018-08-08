@@ -4,13 +4,14 @@
 
 1. 快捷部署多人nginx+php的开发测试环境，不依赖K8S/Swarm
 2. 无需繁杂的机器配置，一键添加开发测试角色
+3. 容器镜像创建之后无需更新，常驻服务
 
 ## Getting Started
 
 **注意：** 快速开始前，请确保当前环境已经安装了：
-- Docker
-- Docker-compose
-- git
+- `Docker`
+- `Docker-compose`
+- `git`
 
 ### 1、下载代码
 
@@ -21,7 +22,7 @@ $ git clone https://github.com/xiongwilee/docker-compose-boilerplate.git
 ### 2、添加测试用户`demo`
 ```
 $ cd docker-compose-boilerplate
-$ sh build.sh -u demo -m admin:master
+$ sh build.sh -u demo
 ```
 此时，在`app/`会创建`demo`目录，在`nginx/conf.d`会创建`demo.conf`文件。
 
@@ -33,6 +34,8 @@ $ docker-compose up -d
 
 ## Instructions
 
+### 1、
+
 ## Configure
 
 ### 1、开发测试环境泛域名解析
@@ -41,7 +44,9 @@ $ docker-compose up -d
 
 ### 3、模块配置
 
-#### 1）PHP模块
+#### 1）部署脚本`build.sh`
+
+#### 2）PHP模块
 
 `app/Dockerfile`文件说明：
 
@@ -57,14 +62,15 @@ $ docker-compose up -d
 
 ##### c. 示例目录`app/sample/sample`：
 
-#### 2）Nginx配置
+#### 3）Nginx配置
 
-#### a. `nginx/conf.d`目录
+##### a. `nginx/conf.d`目录
 
-#### b. `nginx/log`目录
+##### b. `nginx/log`目录
 
 ## TODO
 
 - [ ] 集成jenkins
 - [ ] 前端代码部署方案
 - [ ] 独立的数据库方案
+- [ ] 添加secret参数配置

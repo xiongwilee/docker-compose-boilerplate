@@ -68,9 +68,11 @@ $ docker-compose up -d
 
 ##### b. `nginx/log`目录
 
+#### 4）Jenkins配置方案
+
 ## TODO
 
-- [ ] 集成jenkins
 - [ ] 前端代码部署方案
 - [ ] 独立的数据库方案
 - [ ] 添加secret参数配置
+- [ ] 使nignx平滑reload而不是暴力restart

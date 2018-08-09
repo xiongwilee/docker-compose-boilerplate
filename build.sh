@@ -121,7 +121,7 @@ function updateMod() {
 
     # 清除所有untrack文件
     git clean -df
-    git checkout -f && git fetch
+    git checkout -f && git fetch && git fetch --tags
 
     local branch_name=$(git branch | grep $branch)
     if [ "$branch"x = "master"x  ]; then

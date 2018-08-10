@@ -4,7 +4,7 @@
 set -e
 
 # 业务路径
-compose_path="$HOME/docker-compose"
+compose_path=`cd "$(dirname $0)"; pwd`;
 app_path="$compose_path/app"
 nginx_path="$compose_path/nginx"
 
@@ -32,7 +32,9 @@ while getopts "u:m:d:" OPT; do
     esac
 done
 
+##
 # 帮助提示
+##
 function help() {
     echo "Example:"
     echo "  ./build.sh -u xiongweilie -m admin:online,service:online,tool:online"
@@ -46,15 +48,18 @@ function greenEcho() {
     echo -e "\033[32m ${1} \033[0m";
 }
 
+##
 # 添加App模块
+# @param $1 当前用户名
+##
 function addApp() {
     local sapp_path=$app_path/sample;
     local capp_path=$app_path/$1;
-
+    
     if [ ! -d "$capp_path" ];then
         mkdir $capp_path;
     fi
-
+    
     for i in `ls ${sapp_path}`
     do
         local gitaddress=$sapp_path/$i/.gitaddress;
@@ -63,34 +68,39 @@ function addApp() {
             local gitpath=`cat $gitaddress`;
             # clone代码到对应目录
             git clone $gitpath $capp_path/$i;
-
+            
             greenEcho "创建仓储$gitpah成功: $capp_path/$i";
         else
             cp -r $sapp_path/$i $capp_path/;
             greenEcho "创建目录${i}成功: $capp_path/$i";
         fi
-
+        
         # 执行创建目录完成之后的钩子
-	local on_add_hook=$sapp_path/$i/onAdd.sh;
+	local on_add_hook=$sapp_path/$i/on_add.sh;
 	if [ -f "$on_add_hook" ]; then
-            /bin/sh ${on_add_hook} ${cur_name} ${i} ${sapp_path} ${capp_path} ${gitpath};
+            /bin/sh ${on_add_hook} ${cur_name} ${i} ${sapp_path} ${capp_path};
 	fi
     done
 }
 
+##
 # 添加nginx配置
+# @param $1 当前用户名
+##
 function addNginx() {
     local cnginx_path=$nginx_path/conf.d/$1.conf;
 
     cp $nginx_path/conf.d/sample $cnginx_path;
     sed -i s/\$\{name\}/$1/g $cnginx_path;
-
+    
     greenEcho "创建nginx配置文件成功: $cnginx_path";
-
+    
     restartNginx;
 }
 
+##
 # 重启nginx
+##
 function restartNginx() {
     # 重启nginx
     cd $compose_path;
@@ -98,13 +108,19 @@ function restartNginx() {
     cd -;
 }
 
+##
 # 添加角色
+# @param $1 用户名
+##
 function addRole() {
     addNginx $1;
     addApp $1;
 }
 
+##
 # 删除角色
+# @param $1 当前要删除的用户名
+##
 function delRole() {
     rm -rf $app_path/$1;
     rm -rf $nginx_path/conf.d/$1.conf;
@@ -112,13 +128,20 @@ function delRole() {
     greenEcho "删除用户 ${1} 成功！";
 }
 
+## 
 # 更新模块代码
+# @param $1 模块名称
+# @param $2 分支或tag名称
+## 
 function updateMod() {
-    local mod_path=$app_path/$cur_name/$1;
+    local sapp_path=$app_path/sample;
+    local capp_path=$app_path/$cur_name;
+
+    local mod_path=$capp_path/$1;
     local branch=$2;
 
     cd $mod_path;
-
+    
     # 清除所有untrack文件
     git clean -df
     git checkout -f && git fetch && git fetch --tags
@@ -135,11 +158,19 @@ function updateMod() {
     git checkout $branch
 
     cd -;
+    
+
+    local on_upd_hook=$sapp_path/$1/on_upd.sh;
+    if [ -f "$on_upd_hook" ]; then
+        /bin/sh ${on_upd_hook} ${cur_name} ${1} ${sapp_path} ${capp_path};
+    fi
 
     greenEcho "更新 ${1} 模块代码为 ${branch} 成功: ${mod_path}"
 }
 
+##
 # 部署模块
+##
 function deployMod() {
     local capp_path=$app_path/$cur_name;
     local cnginx_path=$nginx_path/conf.d/$cur_name.conf;
@@ -147,7 +178,7 @@ function deployMod() {
     if [ ! -d "$capp_path" -o ! -f "$cnginx_path" ]; then
         greenEcho "当前用户 ${cur_name} 尚未创建，自动创建中……";
         addRole $cur_name;
-    fi
+    fi 
 
     # 获取$cur_mods参数
     # 然后每个模块更新最新代码
@@ -155,12 +186,20 @@ function deployMod() {
     IFS=","
     array=($cur_mods)
     IFS="$OLD_IFS"
-
+ 
     for each in ${array[*]}
     do
         local cur_module=`echo $each | cut -d ":" -f1`;
         local cur_branch=`echo $each | cut -d ":" -f2`;
-	updateMod $cur_module $cur_branch;
+	if [ -n "$cur_module" ]; then
+	    if [ -z "$cur_branch" -o "$cur_branch"x = "null"x ]; then
+		greenEcho "${cur_module} 模块分支不存在，跳过更新";
+	    else
+	        updateMod $cur_module $cur_branch;
+	    fi
+        else
+            greenEcho "无效的模块名";
+	fi
     done
 }
 
@@ -177,3 +216,5 @@ function main() {
 }
 
 main
+
+

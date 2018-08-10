@@ -64,7 +64,8 @@ Usage:
 
 ##### b. 钩子
 
-- `onAdd.sh`：创建角色时下载PHP模块代码完成之后的回调钩子
+- `on_add.sh`：创建角色时下载PHP模块代码完成之后的回调钩子
+- `on_upd.sh`：某个模块更新完成之后的回调钩子
 
 ##### c. 示例目录`app/sample/sample`：
 

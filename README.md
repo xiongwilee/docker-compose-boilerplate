@@ -7,10 +7,7 @@
 
 ## Getting Started
 
-**注意：** 快速开始前，请确保当前环境已经安装了：
-- Docker
-- Docker-compose
-- git
+**注意：** 当前部署方案仅依赖：`Docker`,`Docker-compose`,`git`
 
 ### 1、下载代码
 
@@ -19,16 +16,20 @@ $ git clone https://github.com/xiongwilee/docker-compose-boilerplate.git
 ```
 
 ### 2、添加测试用户`demo`
+
 ```
 $ cd docker-compose
 $ sh build.sh -u demo -m admin:master
 ```
+
 此时，在`app/`会创建`demo`目录，在`nginx/conf.d`会创建`demo.conf`文件。
 
 ### 3、启动服务
+
 ```
 $ docker-compose up -d
 ```
+
 此时，再执行`docker-compose ps`会发现创建了三个镜像；访问：http://sample.demo.testdomain.com 返回`phpinfo()`信息，说明创建成功。
 
 ## Instructions
@@ -65,7 +66,7 @@ Usage:
 ##### b. 钩子
 
 - `on_add.sh`：创建角色时下载PHP模块代码完成之后的回调钩子，用已更新环境变量等文件
-- `on_upd.sh`：某个模块更新完成之后的回调钩子，用以编译等操作
+- `on_upd.sh`：某个模块更新完成之后的回调钩子，用以编译、重启服务等操作
 
 ##### c. 示例目录`app/sample/sample`：
 

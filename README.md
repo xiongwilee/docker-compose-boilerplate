@@ -64,8 +64,8 @@ Usage:
 
 ##### b. 钩子
 
-- `on_add.sh`：创建角色时下载PHP模块代码完成之后的回调钩子
-- `on_upd.sh`：某个模块更新完成之后的回调钩子
+- `on_add.sh`：创建角色时下载PHP模块代码完成之后的回调钩子，用已更新环境变量等文件
+- `on_upd.sh`：某个模块更新完成之后的回调钩子，用以编译等操作
 
 ##### c. 示例目录`app/sample/sample`：
 
@@ -77,9 +77,17 @@ Usage:
 
 #### 4）Jenkins配置方案
 
-##### a. Docker镜像中的Jenkins与宿主机通信
+##### a. 安装插件获取当前用户
 
-##### b. Jenkins任务配置
+##### b. Docker镜像中的Jenkins与宿主机通信
+
+##### c. 添加job
+
+```
+echo "正在将 admin-fe:${admin_fe},admin:${admin},service:${service},tool:${tool}  部署到 ${BUILD_USER_ID} 环境"
+
+ssh apple@{jenkins内网IP} "sh ~/docker-compose/build.sh -u ${BUILD_USER_ID} -m admin-fe:${admin_fe},admin:${admin},service:${service},tool:${tool}";
+```
 
 #### 5）Gitlab-ci/runner持续集成方案
 
@@ -89,7 +97,7 @@ Usage:
 
 ## TODO
 
-- [ ] 集成jenkins
-- [ ] 前端代码部署方案
+- [x] 集成jenkins
+- [x] 前端代码部署方案
 - [ ] 独立的数据库方案
 - [ ] 使nignx平滑reload而不是暴力restart

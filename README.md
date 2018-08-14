@@ -34,7 +34,7 @@ $ docker-compose up -d
 
 ## Instructions
 
-## Configure
+## Configuration
 
 ### 1、开发测试环境泛域名解析
 

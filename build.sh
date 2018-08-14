@@ -146,16 +146,9 @@ function updateMod() {
     git clean -df
     git checkout -f && git fetch && git fetch --tags
 
-    local branch_name=$(git branch | grep $branch)
-    if [ "$branch"x = "master"x  ]; then
-        git pull origin master
-    elif [ "$branch"x = "online"x ]; then
-        git pull origin online
-    elif [ -n "$branch_name" ];then
-        git branch -D $branch;
-    fi
-
+    # 然后拉取最新代码
     git checkout $branch
+    git pull origin $branch
 
     cd -;
     

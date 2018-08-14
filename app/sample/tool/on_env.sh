@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##
-# git clone 完成之后的行为
+# 更新当前环境变量的钩子
 ##
 
 ## 参数如下
@@ -18,7 +18,3 @@ capp_path=$4;
 # 第一步：复制.env道当前仓储
 cp $sapp_path/$cur_mode/.env $capp_path/$cur_mode/;
 sed -i s/\$\{name\}/$cur_name/g $capp_path/$cur_mode/.env;
-
-# 第二步：修改storage bootstrap目录的权限
-chmod -R 777 $capp_path/$cur_mode/storage;
-chmod -R 777 $capp_path/$cur_mode/bootstrap;

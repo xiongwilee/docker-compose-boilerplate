@@ -48,9 +48,10 @@ $ docker-compose up -d
 Example:
   ./build.sh -u xiongweilie -m admin:online,service:online,tool:online
 Usage:
-  -u 必填，用户名                 示例：default
-  -m 必填，要更新代码的业务模块   示例：admin:online,service:online,tool:online
-  -d 选填，删除用户               示例：default
+  -u 必填，用户名                       示例：default
+  -m 选填，要更新代码的业务模块         示例：admin:online,service:online,tool:online
+  -e 选填，更新业务模块对应的环境变量   示例：admin:true,service:false,tool:false
+  -d 选填，删除用户                     示例：default
 ```
 
 #### 2）PHP模块
@@ -67,6 +68,7 @@ Usage:
 
 - `on_add.sh`：创建角色时下载PHP模块代码完成之后的回调钩子，用已更新环境变量等文件
 - `on_upd.sh`：某个模块更新完成之后的回调钩子，用以编译、重启服务等操作
+- `on_env.sh`：更新环境变量的钩子
 
 ##### c. 示例目录`app/sample/sample`：
 
@@ -87,7 +89,7 @@ Usage:
 ```
 echo "正在将 admin-fe:${admin_fe},admin:${admin},service:${service},tool:${tool}  部署到 ${BUILD_USER_ID} 环境"
 
-ssh apple@{jenkins内网IP} "sh ~/docker-compose/build.sh -u ${BUILD_USER_ID} -m admin-fe:${admin_fe},admin:${admin},service:${service},tool:${tool}";
+ssh apple@{jenkins内网IP} "sh ~/docker-compose/build.sh -u ${BUILD_USER_ID} -m admin-fe:${admin_fe},admin:${admin},service:${service},tool:${tool} -e admin:${admin_env},service:${service_env},tool:${tool_env}";
 ```
 
 #### 5）Gitlab-ci/runner持续集成方案
@@ -101,4 +103,4 @@ ssh apple@{jenkins内网IP} "sh ~/docker-compose/build.sh -u ${BUILD_USER_ID} -m
 - [x] 集成jenkins
 - [x] 前端代码部署方案
 - [ ] 独立的数据库方案
-- [ ] 使nignx平滑reload而不是暴力restart
+- [x] 使nignx平滑reload而不是暴力restart

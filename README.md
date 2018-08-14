@@ -103,4 +103,5 @@ ssh apple@{jenkins内网IP} "sh ~/docker-compose/build.sh -u ${BUILD_USER_ID} -m
 - [x] 集成jenkins
 - [x] 前端代码部署方案
 - [ ] 独立的数据库方案
-- [x] 使nignx平滑reload而不是暴力restart
+- [ ] 接入docker的secret机制
+- [ ] 使nignx平滑reload而不是暴力restart

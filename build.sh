@@ -123,9 +123,12 @@ function addNginx() {
 # 重启nginx
 ##
 function restartNginx() {
-    # 平滑重启nginx
     cd $compose_path;
-    docker-compose exec nginx service nginx reload;
+    # 重启nginx
+    # 通过以下reload方式提示会报错：the input device is not a TTY
+    # 改回docker-compose restart nginx的方案
+    # docker-compose exec nginx service nginx reload;
+    docker-compose restart nginx;
     cd -;
 }
 

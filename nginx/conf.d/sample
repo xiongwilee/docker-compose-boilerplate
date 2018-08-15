@@ -3,11 +3,11 @@ server {
 
     server_name sample.${name}.testdomain.com;
 
-    root /app/${name}/sample/public;
+    root /app/php/${name}/sample/public;
     index index.html index.htm index.php;
 
-    access_log /var/log/nginx/${name}-sample-access.log;
-    error_log /var/log/nginx/${name}-sample-error.log;
+    access_log /var/log/nginx/${name}-sample-php-access.log;
+    error_log /var/log/nginx/${name}-sample-php-error.log;
 
     send_timeout 180;
     keepalive_timeout 300;
@@ -43,13 +43,13 @@ server {
 server {
     listen 80;
 
-    server_name admin.${name}.testdomain.com;
+    server_name web.${name}.testdomain.com;
 
-    root /app/${name}/admin/public;
+    root /app/php/${name}/web/public;
     index index.html index.htm index.php;
 
-    access_log /var/log/nginx/${name}-admin-access.log;
-    error_log /var/log/nginx/${name}-admin-error.log;
+    access_log /var/log/nginx/${name}-web-php-access.log;
+    error_log /var/log/nginx/${name}-web-php-error.log;
 
     send_timeout 180;
     keepalive_timeout 300;
@@ -87,11 +87,11 @@ server {
 
     server_name service.${name}.testdomain.com;
 
-    root /app/${name}/service/public;
+    root /app/php/${name}/service/public;
     index index.html index.htm index.php;
 
-    access_log /var/log/nginx/${name}-service-access.log;
-    error_log /var/log/nginx/${name}-service-error.log;
+    access_log /var/log/nginx/${name}-service-php-access.log;
+    error_log /var/log/nginx/${name}-service-php-error.log;
 
     send_timeout 180;
     keepalive_timeout 300;
@@ -124,44 +124,3 @@ server {
     }
 }
 
-server {
-    listen 80;
-
-    server_name tool.${name}.testdomain.com;
-
-    root /app/${name}/tool/public;
-    index index.html index.htm index.php;
-
-    access_log /var/log/nginx/${name}-tool-access.log;
-    error_log /var/log/nginx/${name}-tool-error.log;
-
-    send_timeout 180;
-    keepalive_timeout 300;
-
-    fastcgi_read_timeout 600;
-    fastcgi_send_timeout 600;
-
-    client_max_body_size 20m;
-
-    location ~* (.+\.(example|bak)$)|(.*protected.*|/\..*) {
-        deny all;
-    }
-
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location ~ \.php$ {
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass app:9000;
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        include fastcgi_params;
-    }
-
-    location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|js|css|ico)$ {
-        log_not_found off;
-        expires 30d ;
-        access_log off;
-    }
-}

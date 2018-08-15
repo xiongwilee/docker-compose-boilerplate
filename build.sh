@@ -5,7 +5,7 @@ set -e
 
 # 业务路径
 compose_path=`cd "$(dirname $0)"; pwd`;
-app_path="$compose_path/app"
+app_path="$compose_path/php"
 nginx_path="$compose_path/nginx"
 
 # 当前操作的用户
@@ -44,7 +44,7 @@ done
 ##
 function help() {
     echo "Example:"
-    echo "  ./build.sh -u xiongweilie -m admin:online,service:online,tool:online"
+    echo "  ./build.sh -u xiongwilee -m admin:online,service:online,tool:online"
     echo "Usage:"
     echo "  -u 必填，用户名                       示例：default"
     echo "  -m 选填，要更新代码的业务模块         示例：admin:online,service:online,tool:online"

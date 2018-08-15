@@ -1,11 +1,11 @@
 version: '3'
 services:
-    app:
-        build: ./app
+    php:
+        build: ./php
         expose:
             - "9000"
         volumes:
-            - "./app:/app"
+            - "./php:/app/php"
         networks:
             - app_net
     nginx:
@@ -15,7 +15,7 @@ services:
             - "80:80"
         # 依赖关系 先跑nodejs和php所有服务
         depends_on:
-            - "app"
+            - "php"
         # 数据卷
         volumes:
             # 映射nginx配置文件
@@ -23,7 +23,7 @@ services:
             # 映射nginx日志文件
             - "./nginx/log:/var/log/nginx"
             # 映射php网关层
-            - "./app:/app"
+            - "./php:/app/php"
         networks:
             - app_net
     jenkins:

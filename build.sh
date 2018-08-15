@@ -112,6 +112,7 @@ function addNginx() {
     local cnginx_path=$nginx_path/conf.d/$1.conf;
 
     cp $nginx_path/conf.d/sample $cnginx_path;
+    # TODO: 这里在MacOS下会报错
     sed -i s/\$\{name\}/$1/g $cnginx_path;
 
     greenEcho "创建nginx配置文件成功: $cnginx_path";

@@ -13,11 +13,11 @@ cur_name=""
 del_name=""
 
 # 当前操作的模块
-# 格式: admin:online,service:online,tool:online
+# 格式: web:online,service:online,tool:online
 cur_mods=""
 
 # 是否更新模块的环境变量
-# 格式：admin:true,service:false,tool:false
+# 格式：web:true,service:false,tool:false
 cur_envs=""
 
 # 获取命令行参数
@@ -44,11 +44,11 @@ done
 ##
 function help() {
     echo "Example:"
-    echo "  ./build.sh -u xiongwilee -m admin:online,service:online,tool:online"
+    echo "  ./build.sh -u xiongwilee -m web:online,service:online,tool:online"
     echo "Usage:"
     echo "  -u 必填，用户名                       示例：default"
-    echo "  -m 选填，要更新代码的业务模块         示例：admin:online,service:online,tool:online"
-    echo "  -e 选填，更新业务模块对应的环境变量   示例：admin:true,service:false,tool:false"
+    echo "  -m 选填，要更新代码的业务模块         示例：web:online,service:online,tool:online"
+    echo "  -e 选填，更新业务模块对应的环境变量   示例：web:true,service:false,tool:false"
     echo "  -d 选填，删除用户                     示例：default"
 }
 

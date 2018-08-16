@@ -13,8 +13,7 @@
 - [DevOps落地实践：BAT系列：CICD：iPipe vs CCI](https://blog.csdn.net/liumiaocn/article/details/77869653)
 - [阿里 DevOps 转型实践](http://www.infoq.com/cn/presentations/ali-devops-transformation-practice)
 
-大型团队的合作框架下，必须依赖更复杂的DevOps架构（参考：[DevOps详解
-](http://www.infoq.com/cn/articles/detail-analysis-of-devops)）。但对于成员不多、负责的Web项目工程量也不大的团队，面临的问题肯定也更单纯：
+大型团队的合作框架下，必须依赖更复杂的DevOps架构（参考：[DevOps详解](http://www.infoq.com/cn/articles/detail-analysis-of-devops)）。但对于成员不多、负责的Web项目工程量也不大的团队，面临的问题肯定也更单纯：
 1. 前后端角色工程解耦，开发环境分离；
 2. 工程师只关注业务逻辑本身，持续集成；
 3. 环境和角色一键创建、一键更新、一键销毁，环境之间不受影响；
@@ -31,7 +30,7 @@
 $ git clone https://github.com/xiongwilee/docker-compose-boilerplate.git
 ```
 
-### 2、添加测试用户`demo`
+### 2、添加测试角色`demo`
 
 ```
 $ cd docker-compose
@@ -46,9 +45,7 @@ $ sh build.sh -u demo -m admin:master
 $ docker-compose up -d
 ```
 
-此时，再执行`docker-compose ps`会发现创建了三个镜像。
-
-配置hosts使`sample.demo.testdomain.com`指向当前机器，然后访问http://sample.demo.testdomain.com 返回`phpinfo()`信息，说明创建成功。
+此时，再执行`docker-compose ps`会发现创建了三个镜像。然后，配置hosts使`sample.demo.testdomain.com`指向当前机器，然后访问http://sample.demo.testdomain.com 返回`phpinfo()`信息，说明创建成功。
 
 ## 三、部署架构说明
 
@@ -71,7 +68,7 @@ $ docker-compose up -d
 ```yaml
 version: '3'
 services:
-	# 所有的PHP环境构建在app容器里
+    # 所有的PHP环境构建在app容器里
     php:
         build: ./php
         expose:
@@ -105,29 +102,37 @@ services:
 
 ## 四、详细配置
 
-### 1、开发测试环境泛域名解析
+### 1、开发测试环境域名配置
+
+在`nginx/conf.d/sample`修改测试环境域名，示例中使用的`testdomain.com`改成自己的测试环境域名即可。
+
+另外，建议把测试域名泛解析到部署这台服务的机器。
 
 ### 2、`docker-compose.yml`配置说明
+
+docker-compose的配置文件基本不需要修改，只需要关注：nginx是80端口映射到80端口，jenkins是8080端口，而php-fpm的9000端口不对外开放即可。
+
+当然了，如果php环境需要安装依赖，就需要修改`./php/Dockerfile`。此外，如果需要添加其他的语言环境，就需要添加一个容器的声明。
 
 ### 3、模块配置
 
 #### 1）部署脚本`build.sh`
 
+业务模块的配置基本是通过部署脚本`build.sh`来操作的。执行`./build.sh`提示如下：
+
 ```
 Example:
-  ./build.sh -u xiongweilie -m admin:online,service:online,tool:online
+  ./build.sh -u xiongwilee -m php:online,service:online
 Usage:
-  -u 必填，用户名                       示例：default
-  -m 选填，要更新代码的业务模块         示例：admin:online,service:online,tool:online
-  -e 选填，更新业务模块对应的环境变量   示例：admin:true,service:false,tool:false
-  -d 选填，删除用户                     示例：default
+  -u 必填，角色名                       示例：default
+  -m 选填，要更新代码的业务模块         示例：php:online,service:online
+  -e 选填，更新业务模块对应的环境变量   示例：php:true,service:false
+  -d 选填，删除角色                     示例：default
 ```
 
 #### 2）PHP模块
 
-`app/Dockerfile`文件说明：
-
-`app/sample`目录说明：
+新增角色实时上是根据`php/sample`目录创建了一个角色名对应的文件夹。在sample里只有四个文件：
 
 ##### a. 仓储配置
 
@@ -135,44 +140,62 @@ Usage:
 
 ##### b. 钩子
 
-- `on_add.sh`：创建角色时下载PHP模块代码完成之后的回调钩子，用已更新环境变量等文件
-- `on_upd.sh`：某个模块更新完成之后的回调钩子，用以编译、重启服务等操作
-- `on_env.sh`：更新环境变量的钩子
+- `on_add.sh`：创建角色时下载PHP模块代码完成之后的回调钩子，用已更新环境变量等文件，执行`./build.sh -u {name}`会被调用
+- `on_upd.sh`：某个模块更新完成之后的回调钩子，用以编译、重启服务等操作，执行`./build.sh -u {name} -m web:master`会被调用
+- `on_env.sh`：更新环境变量的钩子，执行`./build.sh -u {name} -m web:master -e web:true`都会被调用。
 
 ##### c. 示例目录`app/sample/sample`：
+
+在sample目录下还有个sample目录，这个是一个php模块示例；新增角色之后访问sample.{name}.testdomain.com就可以来测试是否成功新增。
 
 #### 3）Nginx配置
 
 ##### a. `nginx/conf.d`目录
 
+和php/sample目录一样，在`nginx/conf.d`下也有个sample文件，这个也是在新增角色时使用的示例配置文件。注意，新增角色会把sample中的${name}替换成当前角色名。
+
 ##### b. `nginx/log`目录
+
+`nginx/log`目录及nginx所有日志文件的宿主机映射目录。
 
 #### 4）Jenkins配置方案
 
-##### a. 安装插件获取当前用户
+jenkins默认开启8080端口，你可以直接通过http://jenkins.testdomain.com:8080访问jenkins服务。具体初始化过程这里不详述。
+
+##### a. 安装插件获取当前用户名
+
+在通过Jenkins执行build.sh脚本时，上文提到的角色名怎么获取呢？其实就是jenkins的用户名，你可以通过创建多个jenkins的用户来创建测试环境角色。
+
+参考[jenkins插件-Build User Vars Plugin简单说明](https://blog.csdn.net/liaojianqiu0115/article/details/78410265)安装jenkins插件。
+
+安装完成之后就可以通过`BUILD_USER`环境变量获取当前jenkins的用户名了（当然了，新建jenkins用户的用户名最好是拼音或英文）。
 
 ##### b. Docker镜像中的Jenkins与宿主机通信
 
+由于jenkins存在Docker镜像中，每次jenkins操作需要执行`build.sh`都需要使镜像中的jenkins与宿主机通信。这里使用的方法是，在jenkins的镜像添加到宿主机的信任关系。
+
+然后就可以通过`ssh apple@{jenkins内网IP} "sh build.sh"`来直接执行宿主机里的脚本了（这里肯定还有更优雅的方法）。
+
 ##### c. 添加job
 
+添加一个任务后只需要配置两项：
+
+1. general：“参数化构建过程”：
+    - 选择 "String Parameter"，添加"web"、"web-fe"、"service"字段
+    - 选择"Boolean Parameter"，添加"web\_env"、“service\_env”字段。
+2. 构建："Execute Shell"：
 ```
-echo "正在将 admin-fe:${admin_fe},admin:${admin},service:${service},tool:${tool}  部署到 ${BUILD_USER_ID} 环境"
+echo "正在将 web-fe:${web_fe},web:${web},service:${service}  部署到 ${BUILD_USER_ID} 环境"
 
-ssh apple@{jenkins内网IP} "sh ~/docker-compose/build.sh -u ${BUILD_USER_ID} -m admin-fe:${admin_fe},admin:${admin},service:${service},tool:${tool} -e admin:${admin_env},service:${service_env},tool:${tool_env}";
+ssh apple@{jenkins内网IP} "sh ~/docker-compose/build.sh -u ${BUILD_USER_ID} -m web-fe:${web_fe},web:${web},service:${service} -e web:${web_env},service:${service_env}";
 ```
 
-#### 5）Gitlab-ci/runner持续集成方案
+这样，通过这个任务就可以直接在jenkins中执行宿主机中的`build.sh`脚本，从而实现新增角色、更新代码的操作了。
 
-##### a. 提交`.gitlab-ci.yml`文件
-
-##### b. 注册gitlab runner
-
-- [Kubernetes会不会被自身的复杂性压垮？](http://www.techug.com/post/will-kubernetes-collapse-under-the-weight-of-its-complexity.html)
-
-当然了，如果需要在PHP的服务基础上集成其他语言的服务，比如Nodejs，涉及到的改动有：
+最后，如果需要在PHP的服务基础上集成其他语言的服务，比如Nodejs，涉及到的改动有：
 1. 添加Nodejs镜像：`docker-compose.yml`
 2. 添加部署任务：`build.sh`
-	- 创建及删除用户流程
+	- 创建及删除角色流程
 	- 部署流程
 3. nginx配置文件示例：`nginx/conf.d/sample`
 

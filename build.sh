@@ -73,6 +73,34 @@ function addHook() {
 }
 
 ##
+# 添加app中的对应目录
+# @param $1 $sapp_path
+# @param $2 $capp_path
+# @param $3 $cur_mode
+## 
+function addAppItem() {
+    local sapp_path=$1;
+    local capp_path=$2;
+    local cur_mode=$3;
+
+    local gitaddress=$sapp_path/$cur_mode/.gitaddress;
+
+    if [ -f "$gitaddress" ];then
+        local gitpath=`cat $gitaddress`;
+        # clone代码到对应目录
+        git clone $gitpath $capp_path/$cur_mode;
+
+        greenEcho "创建仓储$gitpah成功: $capp_path/$cur_mode";
+    else
+        cp -r $sapp_path/$cur_mode $capp_path/;
+        greenEcho "创建目录${cur_mode}成功: $capp_path/$cur_mode";
+    fi
+
+    # 执行创建目录完成之后的钩子
+    addHook "add" ${sapp_path} ${capp_path} ${cur_name} ${cur_mode};
+}
+
+##
 # 添加App模块
 # @param $1 当前用户名
 ##
@@ -86,21 +114,7 @@ function addApp() {
 
     for i in `ls ${sapp_path}`
     do
-        local gitaddress=$sapp_path/$i/.gitaddress;
-
-        if [ -f "$gitaddress" ];then
-            local gitpath=`cat $gitaddress`;
-            # clone代码到对应目录
-            git clone $gitpath $capp_path/$i;
-
-            greenEcho "创建仓储$gitpah成功: $capp_path/$i";
-        else
-            cp -r $sapp_path/$i $capp_path/;
-            greenEcho "创建目录${i}成功: $capp_path/$i";
-        fi
-
-        # 执行创建目录完成之后的钩子
-        addHook "add" ${sapp_path} ${capp_path} ${cur_name} ${i};
+        addAppItem $sapp_path $capp_path $i;
     done
 }
 
@@ -165,6 +179,11 @@ function updateMod() {
 
     local mod_path=$capp_path/$1;
     local branch=$2;
+
+    if [ ! -f "$mod_path" ]; then
+        greenEcho "当前用户 ${cur_name} 下的 ${1} 尚未创建，自动创建中……";
+        addAppItem $sapp_path $capp_path ${1};
+    fi
 
     cd $mod_path;
 

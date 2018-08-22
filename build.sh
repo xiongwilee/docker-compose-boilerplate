@@ -180,7 +180,7 @@ function updateMod() {
     local mod_path=$capp_path/$1;
     local branch=$2;
 
-    if [ ! -f "$mod_path" ]; then
+    if [ ! -d "$mod_path" ]; then
         greenEcho "当前用户 ${cur_name} 下的 ${1} 尚未创建，自动创建中……";
         addAppItem $sapp_path $capp_path ${1};
     fi

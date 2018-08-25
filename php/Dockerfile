@@ -1,5 +1,9 @@
 FROM php:7.0-fpm
 
+# 注入DNS server
+RUN echo "nameserver 8.8.8.8" >> /etc/resolv.conf && \
+    echo "nameserver 8.8.4.4" >> /etc/resolv.conf
+
 # 更新apt-get源 使用阿里云的源
 #RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
 #	echo "deb http://mirrors.aliyuncs.com/debian stretch main contrib non-free" > /etc/apt/sources.list && \

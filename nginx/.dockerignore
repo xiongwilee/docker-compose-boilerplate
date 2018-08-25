@@ -1,0 +1,3 @@
+# 排除所有的当前文件，以防 build 镜像时文件过大
+# Sending build context to Docker daemon 文件过大
+**/*

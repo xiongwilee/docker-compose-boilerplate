@@ -134,17 +134,13 @@ Usage:
 
 新增角色实时上是根据`php/sample`目录创建了一个角色名对应的文件夹。在sample里只有四个文件：
 
-##### a. 仓储配置
+##### a. 钩子
 
-- `.gitaddress`：声明当前模块的远程仓储地址
-
-##### b. 钩子
-
-- `on_add.sh`：创建角色时下载PHP模块代码完成之后的回调钩子，用已更新环境变量等文件，执行`./build.sh -u {name}`会被调用
+- `on_add.sh`：创建角色时下载PHP模块时的回调钩子，用以下载代码、更新环境变量等文件，执行`./build.sh -u {name}`会被调用
 - `on_upd.sh`：某个模块更新完成之后的回调钩子，用以编译、重启服务等操作，执行`./build.sh -u {name} -m web:master`会被调用
 - `on_env.sh`：更新环境变量的钩子，执行`./build.sh -u {name} -m web:master -e web:true`都会被调用。
 
-##### c. 示例目录`app/sample/sample`：
+##### b. 示例目录`app/sample/sample`：
 
 在sample目录下还有个sample目录，这个是一个php模块示例；新增角色之后访问sample.{name}.testdomain.com就可以来测试是否成功新增。
 

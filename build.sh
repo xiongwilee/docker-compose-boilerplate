@@ -83,20 +83,7 @@ function addAppItem() {
     local capp_path=$2;
     local cur_mode=$3;
 
-    local gitaddress=$sapp_path/$cur_mode/.gitaddress;
-
-    if [ -f "$gitaddress" ];then
-        local gitpath=`cat $gitaddress`;
-        # clone代码到对应目录
-        git clone $gitpath $capp_path/$cur_mode;
-
-        greenEcho "创建仓储$gitpah成功: $capp_path/$cur_mode";
-    else
-        cp -r $sapp_path/$cur_mode $capp_path/;
-        greenEcho "创建目录${cur_mode}成功: $capp_path/$cur_mode";
-    fi
-
-    # 执行创建目录完成之后的钩子
+    # 执行创建模块时的钩子
     addHook "add" ${sapp_path} ${capp_path} ${cur_name} ${cur_mode};
 }
 
@@ -126,8 +113,9 @@ function addNginx() {
     local cnginx_path=$nginx_path/conf.d/$1.conf;
 
     cp $nginx_path/conf.d/sample $cnginx_path;
-    # TODO: 这里在MacOS下会报错
-    sed -i s/\$\{name\}/$1/g $cnginx_path;
+    # TODO: 在MacOS下 -i 参数必须指定备份文件后缀，所以添加-e，然后再删除
+    sed -i -e s/\$\{name\}/$1/g $cnginx_path;
+    rm -rf '${cnginx_path}-e';
 
     greenEcho "创建nginx配置文件成功: $cnginx_path";
 

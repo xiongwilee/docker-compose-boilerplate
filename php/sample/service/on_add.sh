@@ -15,10 +15,15 @@ sapp_path=$3;
 capp_path=$4;
 ##
 
-# 第一步：复制.env道当前仓储
-cp $sapp_path/$cur_mode/.env $capp_path/$cur_mode/;
-sed -i s/\$\{name\}/$cur_name/g $capp_path/$cur_mode/.env;
+# 第一步：clone代码
+gitaddress='https://github.com/X-RU/vipx-service.git';
+git clone $gitaddress $capp_path/$cur_mode;
 
-# 第二步：修改storage bootstrap目录的权限
+# 第二步：复制.env到当前仓储
+cp $sapp_path/$cur_mode/.env $capp_path/$cur_mode/;
+sed -i -e s/\$\{name\}/$cur_name/g $capp_path/$cur_mode/.env;
+rm -rf $capp_path/$cur_mode/.env-e;
+
+# 第三步：修改storage bootstrap目录的权限
 chmod -R 777 $capp_path/$cur_mode/storage;
 chmod -R 777 $capp_path/$cur_mode/bootstrap;
